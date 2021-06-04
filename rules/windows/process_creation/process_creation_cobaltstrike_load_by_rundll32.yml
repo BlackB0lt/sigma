@@ -1,13 +1,16 @@
 title: CobaltStrike Load by Rundll32
 status: experimental
 id: ae9c6a7c-9521-42a6-915e-5aaa8689d529
-author: Wojciech Lesicki
+author: Wojciech Lesicki, Sittikorn S
 date: 2021/06/01
+modified: 2021/06/04
 description: Rundll32 can be use by Cobalt Strike with StartW function to load DLLs from the command line.
 references:
     - https://www.cobaltstrike.com/help-windows-executable
     - https://redcanary.com/threat-detection-report/
     - https://thedfirreport.com/2020/10/18/ryuk-in-5-hours/
+    - https://www.microsoft.com/security/blog/2021/01/20/deep-dive-into-the-solorigate-second-stage-activation-from-sunburst-to-teardrop-and-raindrop/
+    - https://www.cobaltstrike.com/help-staged-exe
 tags:
     - attack.defense_evasion
     - attack.t1218.011
@@ -15,12 +18,16 @@ logsource:
     category: process_creation
     product: windows
 detection:
-    selection:
+    selection1:
         CommandLine|contains|all:
             - 'rundll32.exe'
             - '.dll'
             - 'StartW'
-    condition: selection
+    selection2:
+        CommandLine|contains|re:
+            - '[Rr][Uu][Nn][Dd][Ll][Ll][3][2]\s+[Cc]\:\\[Ww][Ii][Nn][Dd][Oo][Ww][Ss](\\[^\\]+)+\.[Dd][Ll][Ll]\s+[a-zA-Z0-9_]{3,}'
+            - '[Rr][Uu][Nn][Dd][Ll][Ll][3][2]\s+[Cc]\:\\[Ww][Ii][Nn][Dd][Oo][Ww][Ss](\\[^\\]+)+\.[Dd][Ll][Ll]\,[a-zA-Z0-9_]{3,}'
+    condition: selection1 or selection2
 falsepositives:
     - Unknown
 level: critical
